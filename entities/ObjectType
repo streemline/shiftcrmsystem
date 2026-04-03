@@ -1,0 +1,47 @@
+{
+  "name": "ObjectType",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043e\u0431\u044a\u0435\u043a\u0442\u0430/\u0442\u0438\u043f\u0430 \u0440\u0430\u0431\u043e\u0442"
+    },
+    "color": {
+      "type": "string",
+      "description": "\u0426\u0432\u0435\u0442 \u043c\u0435\u0442\u043a\u0438 hex"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

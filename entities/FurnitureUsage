@@ -1,0 +1,55 @@
+{
+  "name": "FurnitureUsage",
+  "type": "object",
+  "properties": {
+    "furniture_id": {
+      "type": "string"
+    },
+    "furniture_name": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "quantity_taken": {
+      "type": "number"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "take",
+        "return"
+      ],
+      "description": "\u0412\u0437\u044f\u043b\u0438 \u0438\u043b\u0438 \u0432\u0435\u0440\u043d\u0443\u043b\u0438"
+    },
+    "edit_count": {
+      "type": "number",
+      "default": 0,
+      "description": "\u0421\u043a\u043e\u043b\u044c\u043a\u043e \u0440\u0430\u0437 \u0440\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u043b\u043e\u0441\u044c (\u043c\u0430\u043a\u0441 2)"
+    },
+    "confirmed_by_manager": {
+      "type": "boolean",
+      "default": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "rejected"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "furniture_id",
+    "quantity_taken",
+    "action"
+  ]
+}

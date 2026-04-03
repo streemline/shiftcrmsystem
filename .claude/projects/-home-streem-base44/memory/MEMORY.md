@@ -1,0 +1,2 @@
+- [Project status](project_status.md) — All 16 development steps completed, Base44→Supabase migration done
+- [User context](user_context.md) — Russian-speaking dev, Czech construction company, prefers step-by-step with reports
