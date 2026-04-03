@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase-client';
+import { AUTH_INPUT_CLASS } from '@/lib/authStyles';
 
 export default function LoginPage() {
   const [mode, setMode] = useState('login'); // 'login' | 'register' | 'forgot'
@@ -73,9 +74,13 @@ export default function LoginPage() {
           email: email.trim(),
           password,
         });
-        if (signInError && signInError.message.includes('Email not confirmed')) {
-          setSuccess('Регистрация успешна! Проверьте email для подтверждения.');
-          setMode('login');
+        if (signInError) {
+          if (signInError.message.includes('Email not confirmed')) {
+            setSuccess('Регистрация успешна! Проверьте email для подтверждения.');
+            setMode('login');
+          } else {
+            setError(signInError.message);
+          }
           setIsLoading(false);
           return;
         }
@@ -107,8 +112,7 @@ export default function LoginPage() {
     }
   }
 
-  const inputClass =
-    'w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#D32F2F] transition-colors';
+  const inputClass = AUTH_INPUT_CLASS;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#0A0A0A' }}>

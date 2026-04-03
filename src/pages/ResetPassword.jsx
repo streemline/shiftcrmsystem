@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import { useNavigate } from 'react-router-dom';
+import { AUTH_INPUT_CLASS } from '@/lib/authStyles';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -9,33 +10,44 @@ export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [isValidSession, setIsValidSession] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  // 'checking' | 'valid' | 'invalid'
+  const [sessionState, setSessionState] = useState('checking');
+  const resolved = useRef(false);
+  const timerRef = useRef(null);
 
   useEffect(function () {
-    // Supabase автоматически обрабатывает токен из URL при PASSWORD_RECOVERY
-    // и устанавливает сессию. Проверяем наличие сессии.
-    supabase.auth.getSession().then(function ({ data: { session } }) {
-      if (session) {
-        setIsValidSession(true);
-      } else {
-        setError('Ссылка для сброса пароля недействительна или истекла.');
-      }
-      setIsChecking(false);
-    });
+    function markValid() {
+      if (resolved.current) return;
+      resolved.current = true;
+      setSessionState('valid');
+    }
 
-    // Также слушаем событие PASSWORD_RECOVERY
+    function markInvalid() {
+      if (resolved.current) return;
+      resolved.current = true;
+      setSessionState('invalid');
+      setError('Ссылка для сброса пароля недействительна или истекла.');
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       function (event) {
         if (event === 'PASSWORD_RECOVERY') {
-          setIsValidSession(true);
-          setIsChecking(false);
+          markValid();
         }
       }
     );
 
+    supabase.auth.getSession().then(function ({ data: { session } }) {
+      if (session) {
+        markValid();
+      } else {
+        markInvalid();
+      }
+    });
+
     return function () {
       subscription.unsubscribe();
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
 
@@ -68,17 +80,13 @@ export default function ResetPassword() {
       setError(updateError.message);
     } else {
       setSuccess(true);
-      // Через 2 секунды перенаправляем на главную
-      setTimeout(function () {
+      timerRef.current = setTimeout(function () {
         navigate('/');
       }, 2000);
     }
   }
 
-  const inputClass =
-    'w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#D32F2F] transition-colors';
-
-  if (isChecking) {
+  if (sessionState === 'checking') {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0A0A0A' }}>
         <div className="w-8 h-8 border-4 border-slate-200 border-t-[#D32F2F] rounded-full animate-spin" />
@@ -112,7 +120,7 @@ export default function ResetPassword() {
           </div>
         )}
 
-        {isValidSession && !success && (
+        {sessionState === 'valid' && !success && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-xs text-[#9E9E9E] block mb-1.5">Новый пароль</label>
@@ -122,7 +130,7 @@ export default function ResetPassword() {
                 onChange={function (e) { setPassword(e.target.value); setError(null); }}
                 placeholder="Минимум 6 символов"
                 autoComplete="new-password"
-                className={inputClass}
+                className={AUTH_INPUT_CLASS}
               />
             </div>
             <div>
@@ -133,7 +141,7 @@ export default function ResetPassword() {
                 onChange={function (e) { setConfirmPassword(e.target.value); setError(null); }}
                 placeholder="Повторите пароль"
                 autoComplete="new-password"
-                className={inputClass}
+                className={AUTH_INPUT_CLASS}
               />
             </div>
 
@@ -147,13 +155,13 @@ export default function ResetPassword() {
           </form>
         )}
 
-        {!isValidSession && !success && (
+        {sessionState === 'invalid' && !success && (
           <div className="text-center">
             <button
               onClick={function () { navigate('/'); }}
               className="text-sm text-[#D32F2F] hover:text-[#EF5350] transition-colors"
             >
-              ← Вернуться ко входу
+              Вернуться ко входу
             </button>
           </div>
         )}

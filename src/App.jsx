@@ -18,7 +18,7 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isAuthenticated, onLogin } = useAuth();
+  const { isLoadingAuth, isAuthenticated } = useAuth();
 
   if (isLoadingAuth) {
     return (
@@ -29,7 +29,7 @@ const AuthenticatedApp = () => {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage onLogin={onLogin} />;
+    return <LoginPage />;
   }
 
   return (
